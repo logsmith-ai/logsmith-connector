@@ -29,6 +29,10 @@ func TestSignVerifyFixedSeed(t *testing.T) {
 	if err != nil {
 		t.Fatalf("sign: %v", err)
 	}
+	const wantToken = "eyJjb25uZWN0b3JJZCI6ImNvbm5fcmVmIiwid29ya3NwYWNlSWQiOiJ3c19yZWYiLCJleHAiOjE3MDAwMDAwMDB9.0QPtJHdbJiqICxwyIJ1OE0WJWOoFvAaFifVg45219LLCBezHt_Hzbq5Sjt3DtOuCsRUpq1j1c6dVjQwpaLYwCQ"
+	if tok != wantToken {
+		t.Fatalf("golden token mismatch:\n got: %s\nwant: %s", tok, wantToken)
+	}
 	// Ed25519 is deterministic, so this token is stable across runs and languages.
 	out, err := VerifyToken(pub, tok, 1699999999)
 	if err != nil {
