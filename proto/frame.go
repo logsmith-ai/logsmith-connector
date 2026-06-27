@@ -65,6 +65,9 @@ func ReadTargetHeader(r io.Reader) (string, error) {
 		return "", err
 	}
 	n := binary.BigEndian.Uint16(hdr[:])
+	if n > maxTargetLen {
+		return "", errors.New("proto: target header length exceeds limit")
+	}
 	buf := make([]byte, n)
 	if _, err := io.ReadFull(r, buf); err != nil {
 		return "", err

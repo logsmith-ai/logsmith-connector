@@ -47,3 +47,12 @@ func TestTargetHeaderTooLong(t *testing.T) {
 		t.Fatal("expected error for oversized target")
 	}
 }
+
+func TestReadTargetHeaderRejectsOversized(t *testing.T) {
+	var buf bytes.Buffer
+	buf.Write([]byte{0x01, 0x00}) // big-endian 256, exceeds maxTargetLen (255)
+	buf.Write(make([]byte, 256))
+	if _, err := ReadTargetHeader(&buf); err == nil {
+		t.Fatal("expected error for over-limit declared length")
+	}
+}
