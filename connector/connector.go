@@ -21,6 +21,9 @@ func Run(conn net.Conn, opts Options) error {
 	if opts.Dial == nil {
 		opts.Dial = net.Dial
 	}
+	if err := proto.WriteVersion(conn); err != nil {
+		return err
+	}
 	if err := proto.WriteAuthFrame(conn, opts.Token); err != nil {
 		return err
 	}

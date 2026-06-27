@@ -74,9 +74,25 @@ func TestHandleRejectsBadToken(t *testing.T) {
 
 	connSide, srvSide := net.Pipe()
 	tok, _ := proto.SignToken(otherPriv, proto.Claims{ConnectorID: "c", WorkspaceID: "w", Exp: 1000})
-	go func() { _ = proto.WriteAuthFrame(connSide, tok) }()
+	go func() {
+		_ = proto.WriteVersion(connSide)
+		_ = proto.WriteAuthFrame(connSide, tok)
+	}()
 	if err := srv.Handle(srvSide); err == nil {
 		t.Fatal("expected Handle to reject token signed by unknown key")
+	}
+}
+
+func TestHandleRejectsBadVersion(t *testing.T) {
+	pub, _, _ := ed25519.GenerateKey(nil)
+	srv := New(pub, func() int64 { return 500 })
+	connSide, srvSide := net.Pipe()
+	go func() {
+		_, _ = connSide.Write([]byte{0xFF}) // unsupported version
+		_ = connSide.Close()
+	}()
+	if err := srv.Handle(srvSide); err == nil {
+		t.Fatal("expected Handle to reject an unsupported protocol version")
 	}
 }
 

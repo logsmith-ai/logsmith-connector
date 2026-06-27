@@ -22,7 +22,14 @@ func TestRunAcceptsAndForwards(t *testing.T) {
 		_ = Run(clientConn, Options{Token: "tok-1", Dial: dial})
 	}()
 
-	// Server side: consume auth frame, then yamux server.
+	// Server side: consume version byte, then auth frame, then yamux server.
+	ver, err := proto.ReadVersion(serverConn)
+	if err != nil {
+		t.Fatalf("read version: %v", err)
+	}
+	if ver != proto.ProtocolVersion {
+		t.Fatalf("version got %d want %d", ver, proto.ProtocolVersion)
+	}
 	tok, err := proto.ReadAuthFrame(serverConn)
 	if err != nil {
 		t.Fatalf("read auth: %v", err)

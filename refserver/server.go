@@ -3,6 +3,7 @@ package refserver
 import (
 	"crypto/ed25519"
 	"errors"
+	"fmt"
 	"net"
 	"sync"
 
@@ -29,6 +30,15 @@ func New(pub ed25519.PublicKey, nowFn func() int64) *Server {
 // Handle authenticates one connector connection and registers its session.
 // It returns when the session ends or auth fails.
 func (s *Server) Handle(conn net.Conn) error {
+	ver, err := proto.ReadVersion(conn)
+	if err != nil {
+		conn.Close()
+		return err
+	}
+	if ver != proto.ProtocolVersion {
+		conn.Close()
+		return fmt.Errorf("refserver: unsupported protocol version %d", ver)
+	}
 	token, err := proto.ReadAuthFrame(conn)
 	if err != nil {
 		conn.Close()

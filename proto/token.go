@@ -1,6 +1,7 @@
 package proto
 
 import (
+	"bytes"
 	"crypto/ed25519"
 	"encoding/base64"
 	"encoding/json"
@@ -18,10 +19,25 @@ type Claims struct {
 
 var b64 = base64.RawURLEncoding
 
+// marshalClaims produces the canonical JSON that is signed and that any
+// cross-language signer (e.g. gotham's TypeScript) MUST reproduce byte-for-byte:
+// struct field order (connectorId, workspaceId, exp), exp as a JSON number,
+// UTF-8, HTML escaping DISABLED so '<' '>' '&' stay literal (matching a naive
+// JSON.stringify), and no insignificant whitespace.
+func marshalClaims(c Claims) ([]byte, error) {
+	var buf bytes.Buffer
+	enc := json.NewEncoder(&buf)
+	enc.SetEscapeHTML(false)
+	if err := enc.Encode(c); err != nil {
+		return nil, err
+	}
+	return bytes.TrimRight(buf.Bytes(), "\n"), nil // Encode appends a newline
+}
+
 // SignToken serializes claims to JSON and signs the raw JSON bytes with Ed25519.
 // Output: base64url(claimsJSON) + "." + base64url(signature).
 func SignToken(priv ed25519.PrivateKey, c Claims) (string, error) {
-	payload, err := json.Marshal(c)
+	payload, err := marshalClaims(c)
 	if err != nil {
 		return "", err
 	}
