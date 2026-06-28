@@ -64,5 +64,5 @@ jobs:
       - name: helm template smoke test
         run: |
           helm template logsmith-connector charts/logsmith-connector \
-            --set server=tunnel.logsmith.ai:443 \
+            --set server=tunnel.logsmith.ai:8443 \
             --set token=dummy-token > /dev/null

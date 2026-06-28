@@ -9,7 +9,7 @@ image:
   pullPolicy: IfNotPresent
 
 # Logsmith tunnel-server to dial, as host:port.
-server: tunnel.logsmith.ai:443
+server: tunnel.logsmith.ai:8443
 
 # Enrollment token. Either set `token` (the chart creates a Secret), or point
 # `existingSecret` at a Secret you manage yourself (recommended for production).
