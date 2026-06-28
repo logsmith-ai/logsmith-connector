@@ -1,0 +1,78 @@
+# GoReleaser configuration for logsmith-connector.
+# Docs: https://goreleaser.com
+version: 2
+
+project_name: logsmith-connector
+
+before:
+  hooks:
+    - go mod tidy
+
+builds:
+  - id: logsmith-connector
+    main: ./cmd/logsmith-connector
+    binary: logsmith-connector
+    env:
+      - CGO_ENABLED=0
+    flags:
+      - -trimpath
+    ldflags:
+      - -s -w
+      - -X main.version={{ .Version }}
+      - -X main.commit={{ .Commit }}
+      - -X main.date={{ .Date }}
+    goos:
+      - linux
+      - darwin
+    goarch:
+      - amd64
+      - arm64
+
+archives:
+  - id: default
+    formats: [tar.gz]
+    name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    files:
+      - LICENSE
+      - README.md
+
+checksum:
+  name_template: "checksums.txt"
+
+snapshot:
+  version_template: "{{ incpatch .Version }}-next"
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"
+      - "^chore:"
+
+# Multi-arch Docker images pushed to GitHub Container Registry.
+dockers_v2:
+  - id: connector
+    images:
+      - ghcr.io/logsmith-ai/logsmith-connector
+    tags:
+      - "{{ .Version }}"
+      - "{{ .Major }}.{{ .Minor }}"
+      - latest
+    platforms:
+      - linux/amd64
+      - linux/arm64
+    dockerfile: Dockerfile
+    labels:
+      org.opencontainers.image.title: "{{ .ProjectName }}"
+      org.opencontainers.image.version: "{{ .Version }}"
+      org.opencontainers.image.revision: "{{ .FullCommit }}"
+      org.opencontainers.image.source: "https://github.com/logsmith-ai/logsmith-connector"
+      org.opencontainers.image.licenses: "Apache-2.0"
+
+release:
+  github:
+    owner: logsmith-ai
+    name: logsmith-connector
+  draft: false
+  prerelease: auto

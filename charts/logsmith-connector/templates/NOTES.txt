@@ -1,0 +1,13 @@
+logsmith-connector is deploying.
+
+It dials out to {{ .Values.server }} over TLS and forwards TCP streams to your
+private targets. Nothing listens for inbound connections.
+
+Check it connected:
+
+  kubectl logs -l app.kubernetes.io/instance={{ .Release.Name }} -f
+
+{{- if .Values.insecure }}
+
+WARNING: insecure=true disables TLS verification. Use only for local development.
+{{- end }}

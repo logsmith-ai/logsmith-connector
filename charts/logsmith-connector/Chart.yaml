@@ -1,0 +1,19 @@
+apiVersion: v2
+name: logsmith-connector
+description: |
+  Outbound connector that lets Logsmith reach resources in your private subnet
+  without inbound firewall changes. It dials out over TLS and forwards TCP
+  streams to private targets you choose.
+type: application
+home: https://github.com/logsmith-ai/logsmith-connector
+sources:
+  - https://github.com/logsmith-ai/logsmith-connector
+keywords:
+  - logsmith
+  - connector
+  - tunnel
+maintainers:
+  - name: Logsmith
+# version (chart) and appVersion are overridden at release time from the git tag.
+version: 0.1.0
+appVersion: "0.1.0"

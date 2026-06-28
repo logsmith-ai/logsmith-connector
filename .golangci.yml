@@ -1,0 +1,17 @@
+version: "2"
+
+linters:
+  # Default set: errcheck, govet, ineffassign, staticcheck, unused.
+  # (gosec is intentionally not enabled in CI — see PR notes; the existing
+  # //nolint:gosec directive remains valid for manual `gosec`/lint runs.)
+  exclusions:
+    # Built-in preset that drops the well-known unchecked-error noise, notably
+    # deferred Close() calls and fmt.Print* return values.
+    presets:
+      - std-error-handling
+    rules:
+      # `var _ net.Conn = conn` is an intentional interface-satisfaction
+      # assertion; QF1011 (omit the type) would defeat its purpose.
+      - linters:
+          - staticcheck
+        text: "QF1011"

@@ -1,0 +1,46 @@
+# Default values for logsmith-connector.
+
+replicaCount: 1
+
+image:
+  repository: ghcr.io/logsmith-ai/logsmith-connector
+  # tag defaults to the chart appVersion when empty.
+  tag: ""
+  pullPolicy: IfNotPresent
+
+# Logsmith tunnel-server to dial, as host:port.
+server: tunnel.logsmith.ai:443
+
+# Enrollment token. Either set `token` (the chart creates a Secret), or point
+# `existingSecret` at a Secret you manage yourself (recommended for production).
+token: ""
+existingSecret: "" # name of an existing Secret
+existingSecretKey: token # key within existingSecret holding the token
+
+# Skip TLS verification — DEV ONLY. Leave false in production.
+insecure: false
+
+resources:
+  limits:
+    cpu: 200m
+    memory: 128Mi
+  requests:
+    cpu: 50m
+    memory: 64Mi
+
+nodeSelector: {}
+tolerations: []
+affinity: {}
+
+podAnnotations: {}
+
+# securityContext applied to the pod and container (distroless image runs as nonroot).
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 65532
+securityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  capabilities:
+    drop:
+      - ALL
