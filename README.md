@@ -19,7 +19,7 @@ Images are published to the GitHub Container Registry for `linux/amd64` and
 ```bash
 docker run -d --name logsmith-connector \
   ghcr.io/logsmith-ai/logsmith-connector:latest \
-  --server tunnel.logsmith.ai:443 --token <enrollment-token>
+  --server tunnel.logsmith.ai:8443 --token <enrollment-token>
 ```
 
 ### Binary
@@ -30,7 +30,7 @@ Download the archive for your OS/arch from the
 
 ```bash
 tar -xzf logsmith-connector_*_linux_amd64.tar.gz
-./logsmith-connector --server tunnel.logsmith.ai:443 --token <enrollment-token>
+./logsmith-connector --server tunnel.logsmith.ai:8443 --token <enrollment-token>
 ```
 
 Verify the download against `checksums.txt` from the same release.
@@ -42,7 +42,7 @@ The chart is published as an OCI artifact on ghcr.io:
 ```bash
 helm install logsmith-connector \
   oci://ghcr.io/logsmith-ai/charts/logsmith-connector \
-  --set server=tunnel.logsmith.ai:443 \
+  --set server=tunnel.logsmith.ai:8443 \
   --set token=<enrollment-token>
 ```
 
@@ -54,7 +54,7 @@ kubectl create secret generic logsmith-token --from-literal=token=<enrollment-to
 
 helm install logsmith-connector \
   oci://ghcr.io/logsmith-ai/charts/logsmith-connector \
-  --set server=tunnel.logsmith.ai:443 \
+  --set server=tunnel.logsmith.ai:8443 \
   --set existingSecret=logsmith-token
 ```
 
