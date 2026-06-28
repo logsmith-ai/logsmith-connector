@@ -51,24 +51,51 @@ changelog:
       - "^chore:"
 
 # Multi-arch Docker images pushed to GitHub Container Registry.
-dockers_v2:
-  - id: connector
-    images:
-      - ghcr.io/logsmith-ai/logsmith-connector
-    tags:
-      - "{{ .Version }}"
-      - "{{ .Major }}.{{ .Minor }}"
-      - latest
-    platforms:
-      - linux/amd64
-      - linux/arm64
+# Per-arch builds (each context has the binary at its root, matching the
+# Dockerfile's `COPY logsmith-connector`), stitched into one manifest list.
+dockers:
+  - id: amd64
+    use: buildx
+    goos: linux
+    goarch: amd64
     dockerfile: Dockerfile
-    labels:
-      org.opencontainers.image.title: "{{ .ProjectName }}"
-      org.opencontainers.image.version: "{{ .Version }}"
-      org.opencontainers.image.revision: "{{ .FullCommit }}"
-      org.opencontainers.image.source: "https://github.com/logsmith-ai/logsmith-connector"
-      org.opencontainers.image.licenses: "Apache-2.0"
+    image_templates:
+      - "ghcr.io/logsmith-ai/logsmith-connector:{{ .Version }}-amd64"
+    build_flag_templates:
+      - "--platform=linux/amd64"
+      - "--label=org.opencontainers.image.title={{ .ProjectName }}"
+      - "--label=org.opencontainers.image.version={{ .Version }}"
+      - "--label=org.opencontainers.image.revision={{ .FullCommit }}"
+      - "--label=org.opencontainers.image.source=https://github.com/logsmith-ai/logsmith-connector"
+      - "--label=org.opencontainers.image.licenses=Apache-2.0"
+  - id: arm64
+    use: buildx
+    goos: linux
+    goarch: arm64
+    dockerfile: Dockerfile
+    image_templates:
+      - "ghcr.io/logsmith-ai/logsmith-connector:{{ .Version }}-arm64"
+    build_flag_templates:
+      - "--platform=linux/arm64"
+      - "--label=org.opencontainers.image.title={{ .ProjectName }}"
+      - "--label=org.opencontainers.image.version={{ .Version }}"
+      - "--label=org.opencontainers.image.revision={{ .FullCommit }}"
+      - "--label=org.opencontainers.image.source=https://github.com/logsmith-ai/logsmith-connector"
+      - "--label=org.opencontainers.image.licenses=Apache-2.0"
+
+docker_manifests:
+  - name_template: "ghcr.io/logsmith-ai/logsmith-connector:{{ .Version }}"
+    image_templates:
+      - "ghcr.io/logsmith-ai/logsmith-connector:{{ .Version }}-amd64"
+      - "ghcr.io/logsmith-ai/logsmith-connector:{{ .Version }}-arm64"
+  - name_template: "ghcr.io/logsmith-ai/logsmith-connector:{{ .Major }}.{{ .Minor }}"
+    image_templates:
+      - "ghcr.io/logsmith-ai/logsmith-connector:{{ .Version }}-amd64"
+      - "ghcr.io/logsmith-ai/logsmith-connector:{{ .Version }}-arm64"
+  - name_template: "ghcr.io/logsmith-ai/logsmith-connector:latest"
+    image_templates:
+      - "ghcr.io/logsmith-ai/logsmith-connector:{{ .Version }}-amd64"
+      - "ghcr.io/logsmith-ai/logsmith-connector:{{ .Version }}-arm64"
 
 release:
   github:
