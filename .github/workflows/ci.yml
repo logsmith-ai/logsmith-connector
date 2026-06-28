@@ -41,9 +41,13 @@ jobs:
           cache: true
 
       - name: golangci-lint
-        uses: golangci/golangci-lint-action@v6
+        uses: golangci/golangci-lint-action@v8
         with:
-          version: latest
+          version: v2.12.2
+          # Build from source with the repo's Go toolchain. Prebuilt binaries
+          # lag the latest Go and refuse to run against this module's go 1.26
+          # directive ("built with go1.24 < targeted 1.26").
+          install-mode: goinstall
 
   helm:
     name: Helm lint
