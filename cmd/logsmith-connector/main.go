@@ -3,11 +3,20 @@ package main
 import (
 	"crypto/tls"
 	"flag"
+	"fmt"
 	"log"
 	"net"
+	"os"
 	"time"
 
 	"github.com/logsmith-ai/logsmith-connector/connector"
+)
+
+// Build metadata, stamped at release time via -ldflags by GoReleaser.
+var (
+	version = "dev"
+	commit  = "none"
+	date    = "unknown"
 )
 
 func dialTLS(server string, insecure bool) (net.Conn, error) {
@@ -22,7 +31,13 @@ func main() {
 	server := flag.String("server", "", "tunnel-server host:port")
 	token := flag.String("token", "", "enrollment token")
 	insecure := flag.Bool("insecure", false, "skip TLS verification (dev only)")
+	showVersion := flag.Bool("version", false, "print version and exit")
 	flag.Parse()
+
+	if *showVersion {
+		fmt.Printf("logsmith-connector %s (commit %s, built %s)\n", version, commit, date)
+		os.Exit(0)
+	}
 
 	if *server == "" || *token == "" {
 		log.Fatal("--server and --token are required")
